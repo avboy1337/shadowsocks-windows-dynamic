@@ -30,7 +30,7 @@ func ServerInfo(client, remote, passwd, method *C.char) bool {
 	var err error
 	if cipher, err = core.PickCipher(C.GoString(method), nil, C.GoString(passwd)); err != nil {
 		fmt.Printf("[shadowsocks][core.PickCipher] %v", err)
-		
+
 		return false
 	}
 
@@ -67,6 +67,8 @@ func Create() bool {
 		return false
 	}
 
+	go tcpListen()
+	go udpListen()
 	return true
 }
 
