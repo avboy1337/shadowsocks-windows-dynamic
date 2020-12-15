@@ -2,6 +2,7 @@ package main
 
 import "C"
 import (
+	"fmt"
 	"net"
 
 	"github.com/aiocloud/shadowsocks/core"
@@ -28,14 +29,17 @@ func ServerInfo(client, remote, passwd, method *C.char) bool {
 
 	var err error
 	if cipher, err = core.PickCipher(C.GoString(method), nil, C.GoString(passwd)); err != nil {
+		fmt.Printf("[shadowsocks][core.PickCipher] %v", err)
 		return false
 	}
 
 	if tcpRemoteAddr, err = net.ResolveTCPAddr("tcp", RemoteAddr); err != nil {
+		fmt.Printf("[shadowsocks][net.ResolveTCPAddr] %v", err)
 		return false
 	}
 
 	if udpRemoteAddr, err = net.ResolveUDPAddr("udp", RemoteAddr); err != nil {
+		fmt.Printf("[shadowsocks][net.ResolveUDPAddr] %v", err)
 		return false
 	}
 
@@ -47,12 +51,14 @@ func Create() bool {
 	var err error
 
 	if tcpListenter, err = net.Listen("tcp", ListenAddr); err != nil {
-		Delete()
+		fmt.Printf("[shadowsocks][net.Listen] %v", err)
 
+		Delete()
 		return false
 	}
 
 	if udpListenter, err = net.ListenPacket("udp", ListenAddr); err != nil {
+		fmt.Printf("[shadowsocks][net.ListenPacket] %v", err)
 		Delete()
 
 		return false
