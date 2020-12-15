@@ -30,16 +30,19 @@ func ServerInfo(client, remote, passwd, method *C.char) bool {
 	var err error
 	if cipher, err = core.PickCipher(C.GoString(method), nil, C.GoString(passwd)); err != nil {
 		fmt.Printf("[shadowsocks][core.PickCipher] %v", err)
+		
 		return false
 	}
 
 	if tcpRemoteAddr, err = net.ResolveTCPAddr("tcp", RemoteAddr); err != nil {
 		fmt.Printf("[shadowsocks][net.ResolveTCPAddr] %v", err)
+
 		return false
 	}
 
 	if udpRemoteAddr, err = net.ResolveUDPAddr("udp", RemoteAddr); err != nil {
 		fmt.Printf("[shadowsocks][net.ResolveUDPAddr] %v", err)
+
 		return false
 	}
 
@@ -59,8 +62,8 @@ func Create() bool {
 
 	if udpListenter, err = net.ListenPacket("udp", ListenAddr); err != nil {
 		fmt.Printf("[shadowsocks][net.ListenPacket] %v", err)
-		Delete()
 
+		Delete()
 		return false
 	}
 
