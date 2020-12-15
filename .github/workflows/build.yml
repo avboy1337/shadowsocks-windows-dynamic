@@ -4,63 +4,63 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build
-      runs-on: windows-latest
-      steps:
-        - name: Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: 1.15.x
+    runs-on: windows-latest
+    steps:
+      - name: Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.15.x
 
-        - name: C++
-          uses: msys2/setup-msys2@v2
+      - name: C++
+        uses: msys2/setup-msys2@v2
 
-        - name: Checkout
-          uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-        - name: Build
-          shell: pwsh
-          run: |
-            $Env:CGO_ENABLED=1
-            $Env:GOOS="windows"
-            $Env:GOARCH="amd64"
-            go build -a -trimpath -buildmode=c-shared -asmflags "-s -w" -ldflags "-s -w" -o release\shadowsocks.bin
+      - name: Build
+        shell: pwsh
+        run: |
+          $Env:CGO_ENABLED=1
+          $Env:GOOS="windows"
+          $Env:GOARCH="amd64"
+          go build -a -trimpath -buildmode=c-shared -asmflags "-s -w" -ldflags "-s -w" -o release\shadowsocks.bin
 
-        - name: Run UPX
-          uses: crazy-max/ghaction-upx@v1
-          with:
-            file: .\release\shadowsocks.bin
-            args: --ultra-brute
+      - name: Run UPX
+        uses: crazy-max/ghaction-upx@v1
+        with:
+          file: .\release\shadowsocks.bin
+          args: --ultra-brute
 
-        - name: Checksum
-          shell: pwsh
-          run: |
-            echo "FILE_B_SHA256=$(.\scripts\SHA256.ps1 .\release\shadowsocks.bin)" >> $GITHUB_ENV
-            echo "FILE_H_SHA256=$(.\scripts\SHA256.ps1 .\release\shadowsocks.h)" >> $GITHUB_ENV
+      - name: Checksum
+        shell: pwsh
+        run: |
+          echo "FILE_B_SHA256=$(.\scripts\SHA256.ps1 .\release\shadowsocks.bin)" >> $GITHUB_ENV
+          echo "FILE_H_SHA256=$(.\scripts\SHA256.ps1 .\release\shadowsocks.h)" >> $GITHUB_ENV
 
-        - name: Upload
-          uses: actions/upload-artifact@v2
-          with:
-            name: release
-            path: release
+      - name: Upload
+        uses: actions/upload-artifact@v2
+        with:
+          name: release
+          path: release
 
-        - name: Release
-          uses: softprops/action-gh-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          if: startsWith(github.ref, 'refs/tags/')
-          with:
-            prerelease: true
-            draft: false
-            files: |
-              .\release\shadowsocks.bin
-              .\release\shadowsocks.h
-            body: |
-              [![](https://img.shields.io/badge/Telegram-Group-blue)](https://t.me/aioCloud) [![](https://img.shields.io/badge/Telegram-Channel-green)](https://t.me/aioCloud_channel) 
-              ## 更新日志
-              * 将会很快更新
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          prerelease: true
+          draft: false
+          files: |
+            .\release\shadowsocks.bin
+            .\release\shadowsocks.h
+          body: |
+            [![](https://img.shields.io/badge/Telegram-Group-blue)](https://t.me/aioCloud) [![](https://img.shields.io/badge/Telegram-Channel-green)](https://t.me/aioCloud_channel) 
+            ## 更新日志
+            * 将会很快更新
 
-              ## 校验和
-              | 文件名 | SHA256 |
-              | :-- | :-- |
-              | shadowsocks.bin | ${{ env.FILE_B_SHA256 }} |
-              | shadowsocks.h   | ${{ env.FILE_H_SHA256 }} |
+            ## 校验和
+            | 文件名 | SHA256 |
+            | :-- | :-- |
+            | shadowsocks.bin | ${{ env.FILE_B_SHA256 }} |
+            | shadowsocks.h   | ${{ env.FILE_H_SHA256 }} |
