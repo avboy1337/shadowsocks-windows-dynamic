@@ -27,7 +27,7 @@ func ServerInfo(client, remote, passwd, method *C.char) bool {
 	RemoteAddr = C.GoString(remote)
 
 	var err error
-	if cipher, err = core.PickCipher(method, nil, passwd); err != nil {
+	if cipher, err = core.PickCipher(C.GoString(method), nil, C.GoString(passwd)); err != nil {
 		return false
 	}
 
