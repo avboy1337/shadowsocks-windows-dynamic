@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"sync"
 	"time"
@@ -13,6 +14,7 @@ func udpListen() {
 	for {
 		size, from, err := udpListenter.ReadFrom(buffer)
 		if err != nil {
+			fmt.Printf("[shadowsocks][udpListenter.ReadFrom] %v", err)
 			return
 		}
 
@@ -20,10 +22,12 @@ func udpListen() {
 		if remote == nil {
 			remote, err = net.ListenPacket("udp", "")
 			if err != nil {
+				fmt.Printf("[shadowsocks][net.ListenPacket] %v", err)
 				continue
 			}
 			remote = cipher.PacketConn(remote)
 
+			fmt.Printf("[shadowsocks] New UDP connection from %s to %s", from, udpRemoteAddr)
 			nm.Add(from, udpListenter, remote)
 		}
 
