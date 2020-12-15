@@ -47,14 +47,15 @@ func tcpHandle(client net.Conn) {
 	if _, err = remote.Write(addr); err != nil {
 		return
 	}
+	addr = nil
 
 	go func() {
-		io.Copy(remote, client)
+		io.CopyBuffer(remote, client, make([]byte, 1400))
 		client.SetDeadline(time.Now())
 		remote.SetDeadline(time.Now())
 	}()
 
-	io.Copy(client, remote)
+	io.CopyBuffer(client, remote, make([]byte, 1400))
 	client.SetDeadline(time.Now())
 	remote.SetDeadline(time.Now())
 }
