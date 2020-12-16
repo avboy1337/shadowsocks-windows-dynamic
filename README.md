@@ -31,12 +31,12 @@ namespace Shadowsocks
     {
         public static void Create()
         {
-            NativeMethods.ServerInfo((int)NameList.TYPE_LISN, ":1080");
-            NativeMethods.ServerInfo((int)NameList.TYPE_HOST, "1.1.1.1:80");
-            NativeMethods.ServerInfo((int)NameList.TYPE_PASS, "114514");
-            NativeMethods.ServerInfo((int)NameList.TYPE_METH, "chacha20-ietf");
-            NativeMethods.ServerInfo((int)NameList.TYPE_OBFS, "HTTP");
-            NativeMethods.ServerInfo((int)NameList.TYPE_OBPA, "dash.cloudflare.com");
+            NativeMethods.ServerInfo((int)NameList.TYPE_LISN, Encoding.UTF8.GetBytes(":1080"));
+            NativeMethods.ServerInfo((int)NameList.TYPE_HOST, Encoding.UTF8.GetBytes("1.1.1.1:80"));
+            NativeMethods.ServerInfo((int)NameList.TYPE_PASS, Encoding.UTF8.GetBytes("114514"));
+            NativeMethods.ServerInfo((int)NameList.TYPE_METH, Encoding.UTF8.GetBytes("chacha20-ietf"));
+            NativeMethods.ServerInfo((int)NameList.TYPE_OBFS, Encoding.UTF8.GetBytes("HTTP"));
+            NativeMethods.ServerInfo((int)NameList.TYPE_OBPA, Encoding.UTF8.GetBytes("dash.cloudflare.com"));
 
             if (!NativeMethods.Create())
             {
