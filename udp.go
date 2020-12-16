@@ -87,7 +87,8 @@ func timedCopy(dst net.PacketConn, target net.Addr, src net.PacketConn) {
 	buffer := make([]byte, 1500)
 
 	for {
-		src.SetReadDeadline(time.Now().Add(time.Second * 120))
+		_ = src.SetReadDeadline(time.Now().Add(time.Second * 120))
+
 		size, _, err := src.ReadFrom(buffer)
 		if err != nil {
 			return

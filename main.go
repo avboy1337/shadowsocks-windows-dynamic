@@ -4,6 +4,7 @@ import "C"
 import (
 	"fmt"
 	"net"
+	"strings"
 
 	"github.com/aiocloud/shadowsocks/core"
 	"github.com/aiocloud/shadowsocks/socks"
@@ -12,6 +13,10 @@ import (
 var (
 	ListenAddr string
 	RemoteAddr string
+	Passwd     string
+	Method     string
+	OBFS       string
+	OBFSParam  string
 
 	cipher        core.Cipher
 	tcpListenter  net.Listener
@@ -20,15 +25,40 @@ var (
 	udpRemoteAddr net.Addr
 )
 
+const (
+	TYPE_LISN int = iota
+	TYPE_HOST
+	TYPE_PASS
+	TYPE_METH
+	TYPE_OBFS
+	TYPE_OBPA
+)
+
 //export ServerInfo
-func ServerInfo(client, remote, passwd, method *C.char) bool {
-	socks.UDPEnabled = true
+func ServerInfo(name int, value *C.char) bool {
+	switch name {
+	case TYPE_LISN:
+		ListenAddr = C.GoString(value)
+	case TYPE_HOST:
+		RemoteAddr = C.GoString(value)
+	case TYPE_PASS:
+		Passwd = C.GoString(value)
+	case TYPE_METH:
+		Method = C.GoString(value)
+	case TYPE_OBFS:
+		OBFS = strings.ToUpper(C.GoString(value))
+	case TYPE_OBPA:
+		OBFSParam = C.GoString(value)
+	}
 
-	ListenAddr = C.GoString(client)
-	RemoteAddr = C.GoString(remote)
+	return true
+}
 
+//export Create
+func Create() bool {
 	var err error
-	if cipher, err = core.PickCipher(C.GoString(method), nil, C.GoString(passwd)); err != nil {
+
+	if cipher, err = core.PickCipher(Method, nil, Passwd); err != nil {
 		fmt.Printf("[shadowsocks][core.PickCipher] %v", err)
 
 		return false
@@ -46,13 +76,6 @@ func ServerInfo(client, remote, passwd, method *C.char) bool {
 		return false
 	}
 
-	return true
-}
-
-//export Create
-func Create() bool {
-	var err error
-
 	if tcpListenter, err = net.Listen("tcp", ListenAddr); err != nil {
 		fmt.Printf("[shadowsocks][net.Listen] %v", err)
 
@@ -66,6 +89,8 @@ func Create() bool {
 		Delete()
 		return false
 	}
+
+	socks.UDPEnabled = true
 
 	go tcpListen()
 	go udpListen()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/aiocloud/shadowsocks/socks"
@@ -45,13 +46,17 @@ func tcpHandle(client net.Conn) {
 		return
 	}
 	remote = cipher.StreamConn(remote)
+
+	if strings.Contains(OBFS, "HTTP") {
+		remote = newHTTP(remote)
+	}
+
 	defer remote.Close()
 
 	if _, err = remote.Write(addr); err != nil {
 		fmt.Printf("[shadowsocks][remote.Write] %v", err)
 		return
 	}
-	addr = nil
 
 	fmt.Printf("[shadowsocks] New TCP connection from %s to %s", client.RemoteAddr(), tcpRemoteAddr)
 
