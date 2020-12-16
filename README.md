@@ -5,10 +5,20 @@
 ```csharp
 namespace Shadowsocks
 {
+    public enum NameList : int
+    {
+        TYPE_LISN,
+        TYPE_HOST,
+        TYPE_PASS,
+        TYPE_METH,
+        TYPE_OBFS,
+        TYPE_OBPA
+    }
+
     public static class NativeMethods
     {
         [DllImport("shadowsocks.bin", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool ServerInfo(byte[] client, byte[] remote, byte[] passwd, byte[] method);
+        public static extern bool ServerInfo(int name, byte[] value);
 
         [DllImport("shadowsocks.bin", CallingConvention = CallingConvention.Cdecl)]
         public static extern bool Create();
@@ -21,17 +31,12 @@ namespace Shadowsocks
     {
         public static void Create()
         {
-            var client = Encoding.UTF8.GetBytes("0.0.0.0:1080");
-            var remote = Encoding.UTF8.GetBytes("1.1.1.1:80");
-            var passwd = Encoding.UTF8.GetBytes("114514");
-            var method = Encoding.UTF8.GetBytes("chacha20-ietf");
-
-            if (!NativeMethods.ServerInfo(client, remote, passwd, method))
-            {
-                Console.WriteLine("!NativeMethods.ServerInfo");
-                Console.ReadLine();
-                return;
-            }
+            NativeMethods.ServerInfo((int)NameList.TYPE_LISN, ":1080");
+            NativeMethods.ServerInfo((int)NameList.TYPE_HOST, "1.1.1.1:80");
+            NativeMethods.ServerInfo((int)NameList.TYPE_PASS, "114514");
+            NativeMethods.ServerInfo((int)NameList.TYPE_METH, "chacha20-ietf");
+            NativeMethods.ServerInfo((int)NameList.TYPE_OBFS, "HTTP");
+            NativeMethods.ServerInfo((int)NameList.TYPE_OBPA, "dash.cloudflare.com");
 
             if (!NativeMethods.Create())
             {
