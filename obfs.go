@@ -8,18 +8,6 @@ import (
 	"net"
 )
 
-var (
-	HTTPRequest = "" +
-		"GET / HTTP/1.1\r\n" +
-		"Connection: Upgrade\r\n" +
-		"Upgrade: websocket\r\n" +
-		"Host: %s\r\n" +
-		"User-Agent: curl/7.64.0\r\n" +
-		"Sec-WebSocket-Key: %s\r\n" +
-		"Content-Length: %d\r\n" +
-		"\r\n"
-)
-
 type HTTP struct {
 	net.Conn
 
@@ -75,7 +63,22 @@ func (o *HTTP) Write(data []byte) (int, error) {
 		random := make([]byte, 16)
 		_, _ = rand.Read(random)
 
-		if _, err := o.Conn.Write(append([]byte(fmt.Sprintf(HTTPRequest, OBFSParam, base64.URLEncoding.EncodeToString(random), len(data))), data...)); err != nil {
+		if _, err := o.Conn.Write(append([]byte(
+			fmt.Sprintf(""+
+				"GET / HTTP/1.1\r\n"+
+				"Connection: Upgrade\r\n"+
+				"Upgrade: websocket\r\n"+
+				"Host: %s\r\n"+
+				"User-Agent: curl/7.64.0\r\n"+
+				"Sec-WebSocket-Key: %s\r\n"+
+				"Content-Length: %d\r\n"+
+				"\r\n"+
+				"",
+				OBFSParam,
+				base64.URLEncoding.EncodeToString(random),
+				len(data),
+			),
+		), data...)); err != nil {
 			return 0, err
 		}
 
