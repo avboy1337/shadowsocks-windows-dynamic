@@ -45,11 +45,12 @@ func tcpHandle(client net.Conn) {
 		fmt.Printf("[shadowsocks][net.Dial] %v", err)
 		return
 	}
-	remote = cipher.StreamConn(remote)
 
 	if strings.Contains(OBFS, "HTTP") {
-		remote = newHTTP(remote)
+		remote = &HTTP{Conn: remote}
 	}
+
+	remote = cipher.StreamConn(remote)
 
 	defer remote.Close()
 
